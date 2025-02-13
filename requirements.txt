@@ -2,7 +2,6 @@ chromadb
 streamlit
 openai
 langchain
-pysqlite3
 langchain-openai
 langchain-community
 audio_recorder_streamlit
