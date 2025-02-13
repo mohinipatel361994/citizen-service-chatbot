@@ -7,3 +7,4 @@ chromadb
 dotenv
 bhashini-services1
 audio-recorder-streamlit
+pip 25.0.1
