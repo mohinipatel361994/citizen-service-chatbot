@@ -1,10 +1,10 @@
-chromadb>=0.3.0
-streamlit>=1.12.0
-openai>=0.27.0
-langchain>=0.10.0
-pysqlite3>=0.4.6
+chromadb
+streamlit
+openai
+langchain
+pysqlite3
 langchain-openai
 langchain-community
-bhashini_services1>=1.0.0
+bhashini_services1
 audio_recorder_streamlit
 datetime
