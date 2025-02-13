@@ -10,11 +10,9 @@ from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 import chromadb
 from bhashini_services1 import Bhashini_master
 from audio_recorder_streamlit import audio_recorder
-from dotenv import load_dotenv
+
 from langchain.chains import RetrievalQA
 
-# Load environment variables from .env file
-load_dotenv()
 
 # Set up the Streamlit page configuration
 st.set_page_config(page_title="Citizen service chatbot", page_icon="🤖")
