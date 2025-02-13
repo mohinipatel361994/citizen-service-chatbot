@@ -1,6 +1,5 @@
+python
 streamlit
-langchain
-wave
 langchain-openai
 langchain-community
 openai
