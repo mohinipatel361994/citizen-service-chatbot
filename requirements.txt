@@ -4,6 +4,3 @@ langchain-openai
 langchain-community
 openai
 chromadb
-dotenv
-bhashini-services1
-audio-recorder-streamlit
