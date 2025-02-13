@@ -1,7 +1,6 @@
 streamlit
 langchain
 wave
-shutil
 time
 langchain-openai
 langchain-community
