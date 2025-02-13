@@ -1,8 +1,15 @@
 streamlit
 langchain
+wave
+shutil
+time
 langchain-openai
 langchain-community
 openai
 chromadb
 bhashini_services1
 audio_recorder_streamlit
+datetime
+base64
+json
+os
