@@ -7,5 +7,4 @@ openai
 chromadb
 audio_recorder_streamlit
 datetime
-os
 Python==3.11.9
