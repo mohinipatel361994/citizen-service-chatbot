@@ -1,9 +1,9 @@
-chromadb
 streamlit
 openai
 langchain
 langchain-openai
 langchain-community
-sqlite3>=3.35.0
+chromadb>=0.4.24
+pysqlite3-binary>=0.5.2
 audio_recorder_streamlit
 datetime
