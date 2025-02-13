@@ -5,6 +5,5 @@ langchain
 pysqlite3
 langchain-openai
 langchain-community
-bhashini_services1
 audio_recorder_streamlit
 datetime
