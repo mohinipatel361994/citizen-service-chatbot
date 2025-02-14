@@ -9,7 +9,7 @@ from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from bhashini_services1 import Bhashini_master
 from audio_recorder_streamlit import audio_recorder
-import chromadb
+# import chromadb
 from langchain.chains import RetrievalQA
 
 
@@ -53,8 +53,8 @@ bhashini_master = Bhashini_master(
 
 # Create a directory for ChromaDB
 
-PERSIST_DIR = os.path.join(os.getcwd(), "chroma_db")
-os.makedirs(PERSIST_DIR, exist_ok=True)
+# PERSIST_DIR = os.path.join(os.getcwd(), "chroma_db")
+# os.makedirs(PERSIST_DIR, exist_ok=True)
 
 def get_vectorstore_from_url(url):
     loader = WebBaseLoader(url)
@@ -62,11 +62,11 @@ def get_vectorstore_from_url(url):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=150)
     document_chunks = text_splitter.split_documents(document)
     # st.write(f"Document Chunks: {document_chunks[:]}")
-    client = chromadb.PersistentClient(path=PERSIST_DIR)
+    # client = chromadb.PersistentClient(path=PERSIST_DIR)
     vector_store = Chroma.from_documents(
         documents=document_chunks,
         embedding=OpenAIEmbeddings(api_key=api_key),
-        client=client,
+        # client=client,
         collection_name="website_content"
     )
     return vector_store
