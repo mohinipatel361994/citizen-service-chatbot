@@ -54,19 +54,22 @@ bhashini_master = Bhashini_master(
 
 # Function to process website content and store the embeddings in session state
 def process_website(url):
-    loader = WebBaseLoader(url)
-    document = loader.load()
-    st.write(f"Document loaded: {document}")
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-    document_chunks = text_splitter.split_documents(document)
-    
-    embeddings = OpenAIEmbeddings(api_key=api_key).embed_documents([chunk.page_content for chunk in document_chunks])
-    
-    # Storing embeddings and metadata in session_state
-    st.session_state.embeddings = embeddings
-    st.session_state.document_chunks = document_chunks
+    try:
+        loader = WebBaseLoader(url)
+        document = loader.load()
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=150)
+        document_chunks = text_splitter.split_documents(document)
+        
+        embeddings_model = OpenAIEmbeddings(api_key=api_key)
+        embeddings = embeddings_model.embed_documents([chunk.page_content for chunk in document_chunks])
+        
+        # Storing embeddings and metadata in session_state
+        st.session_state.embeddings = embeddings
+        st.session_state.document_chunks = document_chunks
 
-    st.success("Website content processed successfully!")
+        st.success("Website content processed successfully!")
+    except Exception as e:
+        st.error(f"Error processing website: {str(e)}")
 
 def get_response(user_input):
     if 'embeddings' not in st.session_state or not st.session_state.embeddings:
