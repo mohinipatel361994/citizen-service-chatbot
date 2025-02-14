@@ -96,25 +96,19 @@ def get_response(user_input):
     # Create the prompt using the provided context and question
     prompt = prompt_template.format(context=context, question=user_input)
 
-    # Prepare the messages list as dictionaries
+    # Create the messages list in the correct format
     messages = [
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": user_input},
         {"role": "assistant", "content": prompt}
     ]
+    
+    # Get the response from the language model using the formatted messages
+    response = llm(messages)
 
-    # Make the API call
-    try:
-        response = llm(messages)
+    # Assuming the response is an instance of AIMessage, we access the content attribute
+    return response.content  # Access the content directly
 
-        # Log and inspect the response (to debug the structure)
-        st.write(response)  # This will help in inspecting the response format
-
-        # Access the response content from the 'choices' key
-        return response.choices[0].message.content  
-    except Exception as e:
-        st.error(f"An error occurred: {e}")
-        return "Sorry, something went wrong."
 
 def get_context_retriever_chain(context):
     llm = ChatOpenAI(model="gpt-4", api_key=api_key, temperature=0.7)
