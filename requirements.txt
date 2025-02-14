@@ -1,11 +1,11 @@
-streamlit
-openai
-langchain-openai
-langchain-community
-pysqlite3-binary>=0.5.2
-audio_recorder_streamlit
-datetime
-langchain==0.1.20
-beautifulsoup4
-psycopg2-binary==2.9.10
-chromadb==0.4.24
+chromadb==0.3.18               # Use a known working version
+pysqlite3-binary>=0.5.2        # Ensures that the required sqlite3 version is installed
+streamlit>=1.0.0               # Streamlit version you want to use
+openai==0.27.0                 # OpenAI package
+langchain-openai==0.0.9        # Langchain OpenAI integration
+langchain-community==0.0.2     # Langchain community integration
+pysqlite3-binary>=0.5.2        # Ensure compatibility with chromadb
+audio_recorder_streamlit==0.2  # Audio recorder for streamlit
+datetime                       # For date-time handling
+beautifulsoup4==4.10.0         # BeautifulSoup for web scraping
+psycopg2-binary==2.9.10        # For PostgreSQL connection if used
