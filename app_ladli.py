@@ -2,7 +2,7 @@ import os
 import streamlit as st
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
-from langchain.schema import AIMessage, HumanMessage
+from langchain.schema import SystemMessage, HumanMessage, AIMessage
 from langchain_community.document_loaders import WebBaseLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
