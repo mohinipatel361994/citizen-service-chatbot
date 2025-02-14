@@ -5,17 +5,14 @@ from langchain.prompts import PromptTemplate
 from langchain.schema import AIMessage, HumanMessage
 from langchain_community.document_loaders import WebBaseLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from bhashini_services1 import Bhashini_master
 from audio_recorder_streamlit import audio_recorder
-# import chromadb
-from langchain.chains import RetrievalQA
-
 
 # Set up the Streamlit page configuration
 st.set_page_config(page_title="Citizen service chatbot", page_icon="🤖")
 st.title("Citizen Service Chatbot")
+
 # Available languages for selection
 languages = {
     "English": "en",
@@ -51,32 +48,45 @@ bhashini_master = Bhashini_master(
     ulca_userid=bhashini_ulca_userid
 )
 
-# Create a directory for ChromaDB
-
-# PERSIST_DIR = os.path.join(os.getcwd(), "chroma_db")
-# os.makedirs(PERSIST_DIR, exist_ok=True)
-
-def get_vectorstore_from_url(url):
+# Function to process website content and store the embeddings in session state
+def process_website(url):
     loader = WebBaseLoader(url)
     document = loader.load()
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=150)
     document_chunks = text_splitter.split_documents(document)
-    # st.write(f"Document Chunks: {document_chunks[:]}")
-    # client = chromadb.PersistentClient(path=PERSIST_DIR)
-    vector_store = Chroma.from_documents(
-        documents=document_chunks,
-        embedding=OpenAIEmbeddings(api_key=api_key),
-        # client=client,
-        collection_name="website_content"
-    )
-    return vector_store
-
-
-
-def get_context_retriever_chain(vector_store):
-    llm = ChatOpenAI(model="gpt-4", api_key=api_key, temperature=0.7)
     
-    retriever = vector_store.as_retriever(search_type="similarity", search_kwargs={"k": 3})
+    embeddings = OpenAIEmbeddings(api_key=api_key).embed_documents([chunk.page_content for chunk in document_chunks])
+    
+    # Storing embeddings and metadata in session_state
+    st.session_state.embeddings = embeddings
+    st.session_state.document_chunks = document_chunks
+
+    st.success("Website content processed successfully!")
+
+# Function to retrieve context based on the user's input and the stored embeddings
+def get_response(user_input):
+    if 'embeddings' not in st.session_state or not st.session_state.embeddings:
+        st.error("No embeddings found. Please provide a website URL.")
+        return ""
+
+    # For simplicity, we simulate the retrieval process by matching the closest chunk based on embeddings
+    # In a production app, you would use a more sophisticated similarity search
+    closest_chunk_idx = min(
+        range(len(st.session_state.embeddings)),
+        key=lambda idx: abs(len(st.session_state.document_chunks[idx].page_content) - len(user_input))  # Simulate closeness based on content length
+    )
+    
+    closest_chunk = st.session_state.document_chunks[closest_chunk_idx]
+    context = closest_chunk.page_content
+
+    # Use the context to generate a response
+    retriever_chain = get_context_retriever_chain(context)
+    response = retriever_chain({"query": user_input, "language": language_code})
+    
+    return response.get('result', "Sorry, I couldn't find an answer.")
+
+def get_context_retriever_chain(context):
+    llm = ChatOpenAI(model="gpt-4", api_key=api_key, temperature=0.7)
     
     prompt_template = """You are a helpful assistant. Given the following context information from a website:
 
@@ -87,16 +97,15 @@ def get_context_retriever_chain(vector_store):
     Please respond in the same language as the user's question. Provide a concise and informative answer based on the context above.
     Answer:"""
 
-    
     qa_chain = RetrievalQA.from_chain_type(
         llm=llm,
         chain_type="stuff",
-        retriever=retriever,
+        retriever=None,  # No retriever needed here as we directly pass the context
         return_source_documents=False,
         chain_type_kwargs={
             "prompt": PromptTemplate(
                 template=prompt_template,
-                input_variables=["context", "question","language"],
+                input_variables=["context", "question", "language"],
             ),
         }
     )
@@ -104,82 +113,46 @@ def get_context_retriever_chain(vector_store):
     return qa_chain
 
 
-def get_response(user_input):
-    if 'vector_store' not in st.session_state:
-        st.error("Vector store not found. Please provide a website URL.")
-        return ""
-
-    retriever_chain = get_context_retriever_chain(st.session_state.vector_store)
-
-    try:
-        response = retriever_chain({"query": user_input, "language": language_code})
-        # st.write(f"Raw response from retriever: {response}")
-        result = response.get('result', '')
-        
-        if not result:
-            st.error("Received empty response.")
-            return ""
-        
-        return result
-    
-    except Exception as e:
-        st.error(f"Error occurred while retrieving the response: {e}")
-        return ""
-
-# Sidebar
+# Sidebar for website URL input
 website_url = st.text_input("Paste the URL to process:", placeholder="Enter URL here")
 
-# Initialize session state
+# Initialize session state for chat history if not already done
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = [
-        AIMessage(content="Hello, I am a bot. How can I help you?"),
+        AIMessage(content="Hello, I am a bot. How can I help you?")
     ]
+
+# Process the URL and store data in session state
 if website_url and website_url != st.session_state.get('last_url', ''):
     st.session_state.last_url = website_url
-    st.session_state.chat_history = [] 
-    st.session_state.vector_store = None
-    # st.cache_data
+    st.session_state.chat_history = []  # Reset chat history for new URL
     with st.spinner("Processing website content..."):
-        vector_store = get_vectorstore_from_url(website_url)
-        if vector_store:
-            st.session_state.vector_store = vector_store
-            st.success("Website content processed successfully!")
-        else:
-            st.error("Failed to process website content. Please check the URL and try again.")
-        if 'vector_store' not in st.session_state or st.session_state.vector_store is None:
-            st.error("Vector store not found. Please provide a website URL.")
+        process_website(website_url)
 
 # Handle audio input and transcription using Bhashini
 audio_bytes = audio_recorder("Speak now")
-if not audio_bytes:
-    st.warning("Please record some audio to proceed.")
 if audio_bytes:
     st.write("Audio recorded. Processing...")
     st.session_state.recorded_audio = audio_bytes
-    file_path = bhashini_master.save_audio_as_wav(audio_bytes, directory="output", file_name="last_recording.wav")
-    # Specify language explicitly, assuming input language matches selected language
     transcribed_text = bhashini_master.transcribe_audio(audio_bytes, source_language=language_code)
 
     if transcribed_text:
         st.write("Transcribed Audio:", transcribed_text)
-        response = get_response(transcribed_text)  # Get the response in the same language as the input
-        st.session_state.chat_history.append(HumanMessage(content=transcribed_text))  # Store user query
-        st.session_state.chat_history.append(AIMessage(content=response))  # Store AI response
-        # Convert response back to speech (Text-to-Speech)
+        response = get_response(transcribed_text)
+        st.session_state.chat_history.append(HumanMessage(content=transcribed_text))
+        st.session_state.chat_history.append(AIMessage(content=response))
         bhashini_master.speak(response, source_language=language_code)
     else:
         st.write("Error: Audio transcription failed.")
-        transcribed_text = ""
 
-# Handle user input through chat
+# Handle text input from user
 user_query = st.chat_input("Type your message here...")
 
 if user_query:
     with st.spinner("Generating response..."):
-        response = get_response(user_query)  # Get the response in the selected language
-        st.session_state.chat_history.append(HumanMessage(content=user_query))  # Store user query
-        st.session_state.chat_history.append(AIMessage(content=response))  # Store AI response
-        # Convert response to speech if necessary
+        response = get_response(user_query)
+        st.session_state.chat_history.append(HumanMessage(content=user_query))
+        st.session_state.chat_history.append(AIMessage(content=response))
         bhashini_master.speak(response, source_language=language_code)
 
 # Display the chat history
