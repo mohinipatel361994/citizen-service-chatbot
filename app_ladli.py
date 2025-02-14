@@ -56,7 +56,7 @@ bhashini_master = Bhashini_master(
 def process_website(url):
     loader = WebBaseLoader(url)
     document = loader.load()
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=150)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     document_chunks = text_splitter.split_documents(document)
     
     embeddings = OpenAIEmbeddings(api_key=api_key).embed_documents([chunk.page_content for chunk in document_chunks])
