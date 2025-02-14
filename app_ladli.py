@@ -11,13 +11,7 @@ from bhashini_services1 import Bhashini_master
 from audio_recorder_streamlit import audio_recorder
 import chromadb
 from langchain.chains import RetrievalQA
-import shutil
 
-PERSIST_DIR = os.path.join(os.getcwd(), "chroma_db")
-# Clear the existing chroma_db if it exists
-if os.path.exists(PERSIST_DIR):
-    shutil.rmtree(PERSIST_DIR)
-os.makedirs(PERSIST_DIR, exist_ok=True)
 
 # Set up the Streamlit page configuration
 st.set_page_config(page_title="Citizen service chatbot", page_icon="🤖")
@@ -58,8 +52,9 @@ bhashini_master = Bhashini_master(
 )
 
 # Create a directory for ChromaDB
-# PERSIST_DIR = os.path.join(os.getcwd(), "chroma_db")
-# os.makedirs(PERSIST_DIR, exist_ok=True)
+
+PERSIST_DIR = os.path.join(os.getcwd(), "chroma_db")
+os.makedirs(PERSIST_DIR, exist_ok=True)
 
 def get_vectorstore_from_url(url):
     loader = WebBaseLoader(url)
