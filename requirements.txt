@@ -1,11 +1,11 @@
-chromadb==0.3.18
+streamlit
+openai
+langchain-openai
+langchain-community
 pysqlite3-binary>=0.5.2
-streamlit>=1.0.0
-openai>=1.32.0  # Update openai version for compatibility with langchain-openai
-langchain-openai==0.2.26  # Ensure compatibility with openai
-langchain-community==0.0.2
-langchain-core>=0.2.26
-audio_recorder_streamlit==0.0.9  # Use a working version
+audio_recorder_streamlit
 datetime
-beautifulsoup4==4.10.0
+langchain==0.1.20
+beautifulsoup4
 psycopg2-binary==2.9.10
+chromadb==0.4.24
