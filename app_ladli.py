@@ -56,6 +56,7 @@ bhashini_master = Bhashini_master(
 def process_website(url):
     loader = WebBaseLoader(url)
     document = loader.load()
+    st.write(f"Document loaded: {document}")
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     document_chunks = text_splitter.split_documents(document)
     
