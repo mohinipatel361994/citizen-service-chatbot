@@ -108,7 +108,7 @@ def get_response(user_input):
 
     # Assuming the response is an instance of AIMessage, we access the content attribute
     return response.content  # Access the content directly
-
+    
 
 def get_context_retriever_chain(context):
     llm = ChatOpenAI(model="gpt-4", api_key=api_key, temperature=0.7)
