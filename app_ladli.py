@@ -72,10 +72,10 @@ def get_response(user_input):
         st.error("No embeddings found. Please provide a website URL.")
         return ""
 
-    # Find the closest chunk of text based on the user's input (simplified approach)
+    # Find the closest chunk of text based on the user's input
     closest_chunk_idx = min(
         range(len(st.session_state.embeddings)),
-        key=lambda idx: abs(len(st.session_state.document_chunks[idx].page_content) - len(user_input))  # Simulate closeness based on content length
+        key=lambda idx: abs(len(st.session_state.document_chunks[idx].page_content) - len(user_input))
     )
     
     closest_chunk = st.session_state.document_chunks[closest_chunk_idx]
@@ -84,32 +84,22 @@ def get_response(user_input):
     # Use the context directly in the LLM for response generation
     llm = ChatOpenAI(model="gpt-4", api_key=api_key, temperature=0.7)
     
-    prompt_template = """You are a helpful assistant. Given the following context information from a website:
+    # Create the messages list using proper message objects
+    messages = [
+        SystemMessage(content="You are a helpful assistant."),
+        HumanMessage(content=f"""Given the following context information from a website:
 
     {context}
-
-    The user has asked the following question: "{question}"
-
-    Please respond in the same language as the user's question. Provide a concise and informative answer based on the context above.
-    Answer:"""
-
-    # Create the prompt using the provided context and question
-    prompt = prompt_template.format(context=context, question=user_input)
-
-    # Create the messages list in the correct format
-    messages = [
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": user_input},
-        {"role": "assistant", "content": prompt}
-    ]
     
-    # Get the response from the language model using the formatted messages
+    The user has asked the following question: "{user_input}"
+    
+    Please respond in the same language as the user's question. Provide a concise and informative answer based on the context above.""")
+        ]
+    
+    # Get the response from the language model
     response = llm(messages)
-
-    # Assuming the response is an instance of AIMessage, we access the content attribute
-    return response.content  # Access the content directly
+    return response.content
     
-
 def get_context_retriever_chain(context):
     llm = ChatOpenAI(model="gpt-4", api_key=api_key, temperature=0.7)
     
