@@ -8,5 +8,4 @@ datetime
 langchain==0.1.20
 chromadb==0.4.24
 beautifulsoup4
-psycopg2
 psycopg2-binary
