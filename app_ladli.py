@@ -56,7 +56,6 @@ PERSIST_DIR = os.path.join(os.getcwd(), "chroma_db")
 os.makedirs(PERSIST_DIR, exist_ok=True)
 
 def get_vectorstore_from_url(url):
-    try:
         loader = WebBaseLoader(url)
         document = loader.load()
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=150)
@@ -70,9 +69,7 @@ def get_vectorstore_from_url(url):
             collection_name="website_content"
         )
         return vector_store
-    except Exception as e:
-        st.error(f"Error processing the website: {e}")
-        return None
+
 
 
 def get_context_retriever_chain(vector_store):
