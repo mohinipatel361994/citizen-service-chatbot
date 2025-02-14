@@ -96,7 +96,7 @@ def get_response(user_input):
     # Create the prompt using the provided context and question
     prompt = prompt_template.format(context=context, question=user_input)
 
-    # Create the messages list in the correct format
+    # Prepare the messages list in dictionary format
     messages = [
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": user_input},
@@ -106,8 +106,9 @@ def get_response(user_input):
     # Get the response from the language model using the formatted messages
     response = llm(messages)
 
-    # Assuming the response is an instance of AIMessage, we access the content attribute
-    return response.content  # Access the content directly
+    # Assuming the response is a dictionary with a 'content' field
+    return response['choices'][0]['message']['content']  # Access the content from the API response
+
 
 
 def get_context_retriever_chain(context):
