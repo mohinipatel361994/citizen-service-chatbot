@@ -1,6 +1,6 @@
 import os
 import streamlit as st
-import base64
+from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 from langchain.schema import AIMessage, HumanMessage
 from langchain_community.document_loaders import WebBaseLoader
@@ -9,9 +9,11 @@ from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from bhashini_services1 import Bhashini_master
 from audio_recorder_streamlit import audio_recorder
 
+
 # Set up the Streamlit page configuration
 st.set_page_config(page_title="Citizen service chatbot", page_icon="🤖")
 st.title("Citizen Service Chatbot")
+#load_dotenv()
 
 # Available languages for selection
 languages = {
@@ -39,6 +41,8 @@ bhashini_url = st.secrets["secret_section"]["bhashini_url"]
 bhashini_authorization_key = st.secrets["secret_section"]["bhashini_authorization_key"]
 bhashini_ulca_api_key = st.secrets["secret_section"]["bhashini_ulca_api_key"]
 bhashini_ulca_userid = st.secrets["secret_section"]["bhashini_ulca_userid"]
+
+
 
 # Initialize Bhashini master for transcription and translation
 bhashini_master = Bhashini_master(
@@ -102,7 +106,9 @@ def get_response(user_input):
     # Get the response from the language model using the formatted messages
     response = llm(messages)
 
-    return response['text']  # This returns the generated text from the model
+    # Assuming the response is an instance of AIMessage, we access the content attribute
+    return response.content  # Access the content directly
+
 
 def get_context_retriever_chain(context):
     llm = ChatOpenAI(model="gpt-4", api_key=api_key, temperature=0.7)
