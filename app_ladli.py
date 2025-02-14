@@ -69,8 +69,7 @@ def get_response(user_input):
         st.error("No embeddings found. Please provide a website URL.")
         return ""
 
-    # For simplicity, we simulate the retrieval process by matching the closest chunk based on embeddings
-    # In a production app, you would use a more sophisticated similarity search
+    # Find the closest chunk of text based on the user's input (simplified approach)
     closest_chunk_idx = min(
         range(len(st.session_state.embeddings)),
         key=lambda idx: abs(len(st.session_state.document_chunks[idx].page_content) - len(user_input))  # Simulate closeness based on content length
@@ -79,12 +78,26 @@ def get_response(user_input):
     closest_chunk = st.session_state.document_chunks[closest_chunk_idx]
     context = closest_chunk.page_content
 
-    # Use the context to generate a response
-    retriever_chain = get_context_retriever_chain(context)
-    response = retriever_chain({"query": user_input, "language": language_code})
+    # Use the context directly in the LLM for response generation
+    llm = ChatOpenAI(model="gpt-4", api_key=api_key, temperature=0.7)
     
-    return response.get('result', "Sorry, I couldn't find an answer.")
+    prompt_template = """You are a helpful assistant. Given the following context information from a website:
 
+    {context}
+
+    The user has asked the following question: "{question}"
+
+    Please respond in the same language as the user's question. Provide a concise and informative answer based on the context above.
+    Answer:"""
+
+    # Create the prompt and pass it to the model
+    prompt = prompt_template.format(context=context, question=user_input)
+    
+    # Get the response from the language model
+    response = llm(prompt)
+    
+    return response['text']  # This returns the generated text from the model
+    
 def get_context_retriever_chain(context):
     llm = ChatOpenAI(model="gpt-4", api_key=api_key, temperature=0.7)
     
