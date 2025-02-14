@@ -56,19 +56,19 @@ PERSIST_DIR = os.path.join(os.getcwd(), "chroma_db")
 os.makedirs(PERSIST_DIR, exist_ok=True)
 
 def get_vectorstore_from_url(url):
-        loader = WebBaseLoader(url)
-        document = loader.load()
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=150)
-        document_chunks = text_splitter.split_documents(document)
-        # st.write(f"Document Chunks: {document_chunks[:]}")
-        client = chromadb.PersistentClient(path=PERSIST_DIR)
-        vector_store = Chroma.from_documents(
-            documents=document_chunks,
-            embedding=OpenAIEmbeddings(api_key=api_key),
-            client=client,
-            collection_name="website_content"
-        )
-        return vector_store
+    loader = WebBaseLoader(url)
+    document = loader.load()
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=150)
+    document_chunks = text_splitter.split_documents(document)
+    # st.write(f"Document Chunks: {document_chunks[:]}")
+    client = chromadb.PersistentClient(path=PERSIST_DIR)
+    vector_store = Chroma.from_documents(
+        documents=document_chunks,
+        embedding=OpenAIEmbeddings(api_key=api_key),
+        client=client,
+        collection_name="website_content"
+    )
+    return vector_store
 
 
 
