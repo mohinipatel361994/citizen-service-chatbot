@@ -111,7 +111,7 @@ def get_response(user_input):
         st.write(response)  # This will help in inspecting the response format
 
         # Access the response content from the 'choices' key
-        return response['choices'][0]['message']['content']  # Access the content from the API response
+        return response.choices[0].message.content  
     except Exception as e:
         st.error(f"An error occurred: {e}")
         return "Sorry, something went wrong."
