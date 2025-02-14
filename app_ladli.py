@@ -72,12 +72,25 @@ def get_response(user_input):
         st.error("No embeddings found. Please provide a website URL.")
         return ""
 
-    # Find the closest chunk of text based on the user's input
-    closest_chunk_idx = min(
-        range(len(st.session_state.embeddings)),
-        key=lambda idx: abs(len(st.session_state.document_chunks[idx].page_content) - len(user_input))
-    )
+    # Create embeddings for the user query
+    embeddings_model = OpenAIEmbeddings(api_key=api_key)
+    query_embedding = embeddings_model.embed_query(user_input)
     
+    # Calculate cosine similarity between query and all document chunks
+    from numpy import dot
+    from numpy.linalg import norm
+    
+    def cosine_similarity(v1, v2):
+        return dot(v1, v2) / (norm(v1) * norm(v2))
+    
+    # Find the most relevant chunk using cosine similarity
+    similarities = [
+        cosine_similarity(query_embedding, doc_embedding) 
+        for doc_embedding in st.session_state.embeddings
+    ]
+    
+    # Get the index of the chunk with highest similarity
+    closest_chunk_idx = similarities.index(max(similarities))
     closest_chunk = st.session_state.document_chunks[closest_chunk_idx]
     context = closest_chunk.page_content
 
@@ -86,15 +99,17 @@ def get_response(user_input):
     
     # Create the messages list using proper message objects
     messages = [
-        SystemMessage(content="You are a helpful assistant."),
-        HumanMessage(content=f"""Given the following context information from a website:
-
-    {context}
-    
-    The user has asked the following question: "{user_input}"
-    
-    Please respond in the same language as the user's question. Provide a concise and informative answer based on the context above.""")
-        ]
+        SystemMessage(content=f"""You are a helpful assistant that provides information based on the given context. 
+        Your responses should be accurate and directly related to the context provided.
+        If the answer cannot be found in the context, politely state that you don't have enough information to answer the question.
+        Always maintain the same language as the user's question."""),
+                HumanMessage(content=f"""Context information:
+        {context}
+        
+        User question: {user_input}
+        
+        Please provide a concise and informative answer based strictly on the above context.""")
+    ]
     
     # Get the response from the language model
     response = llm(messages)
