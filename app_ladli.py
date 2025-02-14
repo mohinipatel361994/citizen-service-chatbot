@@ -103,13 +103,12 @@ def get_response(user_input):
 def get_context_retriever_chain(context):
     llm = ChatOpenAI(model="gpt-4", api_key=api_key, temperature=0.7)
     
-    prompt_template = """You are a helpful assistant. Given the following context information from a website:
+    prompt_template = """You are a helpful assistant. Answer the following question based on the context provided:
 
-    {context}
+    Context: {context}
 
-    The user has asked the following question: "{question}"
+    Question: {question}
 
-    Please respond in the same language as the user's question. Provide a concise and informative answer based on the context above.
     Answer:"""
 
     qa_chain = RetrievalQA.from_chain_type(
