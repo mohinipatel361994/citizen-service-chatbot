@@ -103,13 +103,13 @@ def get_response(user_input):
         Your responses should be accurate and directly related to the context provided.
         If the answer cannot be found in the context, politely state that you don't have enough information to answer the question.
         Always maintain the same language as the user's question."""),
-                HumanMessage(content=f"""Context information:
+        HumanMessage(content=f"""Context information:
         {context}
         
         User question: {user_input}
         
         Please provide a concise and informative answer based strictly on the above context.""")
-    ]
+                ]
     
     # Get the response from the language model
     response = llm(messages)
