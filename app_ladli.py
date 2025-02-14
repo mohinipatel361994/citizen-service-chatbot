@@ -102,12 +102,19 @@ def get_response(user_input):
         {"role": "user", "content": user_input},
         {"role": "assistant", "content": prompt}
     ]
-    
-    # Get the response from the language model using the formatted messages
-    response = llm(messages)
 
-    # Access the response content (fix based on the structure)
-    return response['choices'][0]['message']['content']  # Access the content from the API response
+    # Make the API call
+    try:
+        response = llm(messages)
+
+        # Log and inspect the response (to debug the structure)
+        st.write(response)  # This will help in inspecting the response format
+
+        # Access the response content from the 'choices' key
+        return response['choices'][0]['message']['content']  # Access the content from the API response
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
+        return "Sorry, something went wrong."
 
 def get_context_retriever_chain(context):
     llm = ChatOpenAI(model="gpt-4", api_key=api_key, temperature=0.7)
