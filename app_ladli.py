@@ -63,7 +63,6 @@ def process_website(url):
 
     st.success("Website content processed successfully!")
 
-# Function to retrieve context based on the user's input and the stored embeddings
 def get_response(user_input):
     if 'embeddings' not in st.session_state or not st.session_state.embeddings:
         st.error("No embeddings found. Please provide a website URL.")
@@ -90,14 +89,21 @@ def get_response(user_input):
     Please respond in the same language as the user's question. Provide a concise and informative answer based on the context above.
     Answer:"""
 
-    # Create the prompt and pass it to the model
+    # Create the prompt using the provided context and question
     prompt = prompt_template.format(context=context, question=user_input)
+
+    # Create the messages list in the correct format
+    messages = [
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": user_input},
+        {"role": "assistant", "content": prompt}
+    ]
     
-    # Get the response from the language model
-    response = llm(prompt)
-    
+    # Get the response from the language model using the formatted messages
+    response = llm(messages)
+
     return response['text']  # This returns the generated text from the model
-    
+
 def get_context_retriever_chain(context):
     llm = ChatOpenAI(model="gpt-4", api_key=api_key, temperature=0.7)
     
