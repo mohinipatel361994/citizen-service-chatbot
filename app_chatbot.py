@@ -44,11 +44,11 @@ st.write(f"Selected language: {selected_language}")
 # Fetch API key for OpenAI
 api_key = os.getenv("openai_api_key")
 
-# Bhashini credentials
-bhashini_url = os.getenv("bhashini_url")
-bhashini_authorization_key = os.getenv("bhashini_authorization_key")
-bhashini_ulca_api_key = os.getenv("bhashini_ulca_api_key")
-bhashini_ulca_userid = os.getenv("bhashini_ulca_userid")
+api_key = st.secrets["secret_section"]["openai_api_key"]
+bhashini_url = st.secrets["secret_section"]["bhashini_url"]
+bhashini_authorization_key = st.secrets["secret_section"]["bhashini_authorization_key"]
+bhashini_ulca_api_key = st.secrets["secret_section"]["bhashini_ulca_api_key"]
+bhashini_ulca_userid = st.secrets["secret_section"]["bhashini_ulca_userid"]
 
 # Initialize Bhashini master for transcription
 bhashini_master = Bhashini_master(
